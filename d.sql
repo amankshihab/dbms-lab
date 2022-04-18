@@ -1,15 +1,12 @@
+create or replace trigger dup_check before insert or update of flight_name on flight_details for each row
 declare
-date_1 date;
-date_2 date;
-test varchar(20);
+    cnt int;
 begin
-    date_1 := '1-JAN-2022';
-    date_2 := '2-JAN-2022';
 
-    dbms_output.put_line(date_2 - date_1);
-    dbms_output.put_line(MOD(40,30));
+    select count(*) into cnt from flight_details where flight_name=:new.flight_name;
 
-    test := 'H' || test_seq.nextval;
-
-    insert into test_table values (test);
+    if cnt > 0 then
+        raise_application_error(-20001,'Duplicate flight name');
+    end if;
 end;
+/
